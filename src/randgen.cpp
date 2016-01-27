@@ -14,12 +14,21 @@
 #include <set>
 #include <sstream>
 #include <cstdlib>
+#include <random>
+#include "aminoacids.hpp"
 
 using namespace std;
 
 map< int, long > n;
 map< int, vector<int> > edges;
+map< int, vector<int> > labels;
+map< int, vector<double> > weights;
+
 set<int> accepting;
+
+mt19937 generator (time(NULL) + getpid());
+uniform_real_distribution<double> dis(0.0, 1.0);
+
 
 long dfs( int start ){
 	if( accepting.count(start)>0 ){
@@ -29,23 +38,51 @@ long dfs( int start ){
 		return 0;
 	}
 	if( n.count(start)==0){
-		for( vector<int>::const_iterator c = edges.at(start).begin();
-			c != edges.at(start).end(); ++c ){
-			n[start] += dfs( *c );
+		for( int i = 0 ; i < edges.at(start).size() ; i ++ ){
+			weights[start].push_back( dfs( edges[start][i] ) );
+			n[start] += weights[start][i];
+		}
+		for( int i = 0 ; i < edges.at(start).size() ; i ++ ){
+			weights[start][i] /= n[start];
 		}
 	}
 	return n[start];
 }
 
+void sample( int start ){
+	if( accepting.count(start) > 0 || edges.count(start)==0 ){
+		cout << endl;
+		return;
+	}
+	double r = dis( generator );
+	for( int i = 0 ; i < edges.at(start).size() ; i ++ ){
+		r -= weights[start][i];
+		if( r < 0 ){
+			cout << aminoacids[labels[start][i]-1];
+			sample( edges[start][i] );
+			return;
+		}
+	}
+}
+
+
 int main( int argc, char * argv[] )
 {
 	string line; int tok;
 	vector<int> tokens;
-
+	int N;
 
 	int initial=0;
-	if( argc == 2 ){
-		initial = atoi(argv[1]);
+	if( argc >= 2 ){
+		N = atoi(argv[1]);
+		if( N < 0 ){
+			N = 1;
+		}
+	} else {
+		N = 1;
+	}
+	if( argc >= 3 ){
+		initial = atoi(argv[2]);
 	}
 	while( cin ){
 		getline( cin, line );
@@ -60,15 +97,14 @@ int main( int argc, char * argv[] )
 			}
 		}
 		if( tokens.size() == 1 ){
-			//cout << "acc " << tokens[0] << endl;
 			accepting.insert( tokens[0] );
 		}
 		if( tokens.size() >= 2 ){
-			//cout << "edg " << tokens[0] << " " << tokens[1] << endl;
 			edges[tokens[0]].push_back( tokens[1] );
+			labels[tokens[0]].push_back( tokens[2] );
 		}
 	}
 	long npaths = 0;
 	npaths += dfs( initial );
-	cout << npaths << endl;
+	while( N-->0 ) sample( initial );
 }

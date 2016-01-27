@@ -5,3 +5,6 @@ all : contiguous-fa countpaths mjc-fa
 
 printlang: printlang.cpp
 	g++ -O3 -o $@ $<
+
+countpaths: countpaths.cpp
+	g++ -O3 -o $@ $<
