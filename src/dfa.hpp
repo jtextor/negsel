@@ -385,14 +385,26 @@ int DFA<S>::pureAcceptingRec( long state, unordered_set<long>& R, unordered_set<
 
 template <unsigned int S>
 void DFA<S>::print( char * alphabet ){
-
+	// output edges out of starting state first, for fstcompile
 	for( int c = 0 ; c < S ; c ++ ){
-		for( unordered_map< long, long >::const_iterator ei = 
-			EE[c].begin() ; ei != EE[c].end() ; ++ei ){
-			std::cout << ei -> first << " " << ei -> second << 
+		if( EE[c].find(0) != EE[c].end() ){
+			std::cout << 0 << " " << EE[c][0] << 
 				" " << 
 				(alphabet != NULL ? alphabet[c] : c+1)
 			<< "\n";
+		}
+	}
+
+	// now output other edges
+	for( int c = 0 ; c < S ; c ++ ){
+		for( unordered_map< long, long >::const_iterator ei = 
+			EE[c].begin() ; ei != EE[c].end() ; ++ei ){
+			if( ei -> first != 0 ){
+				std::cout << ei -> first << " " << ei -> second << 
+					" " << 
+					(alphabet != NULL ? alphabet[c] : c+1)
+				<< "\n";
+			}
 		}
 	}
 
