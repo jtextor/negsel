@@ -25,11 +25,10 @@ void add_match_edge( DFA<N_AMINOACIDS+1> & R , int s1, int s2, int c,
 DFA<N_AMINOACIDS+1> branch_for_peptide( string pep, int n, int r ){
 	DFA<N_AMINOACIDS+1> R;
 	if( n == 0 ){ return R; };
-	if( r > n ){ r = n; };
+	// if( r > n ){ r = n; };
 	map<long,long> Vcode;
 	int i, l;
-	int acc = (2*n-r)*(r+1)/2;
-	// cerr <<"A " << acc << endl;
+	int acc = n*n+1; // cerr <<"A " << acc << endl;
 	int row = 0;
 	R.addState( 0, Vcode );
 	for( l = 0 ; l <= r && l <= n ; l ++ ){
@@ -49,7 +48,7 @@ DFA<N_AMINOACIDS+1> branch_for_peptide( string pep, int n, int r ){
 			R.addEdge( row+n-l-1, acc, c2i(pep[n-1]), Vcode );
 			//cerr << row+i << "\t" << acc << "\t" << pep[n-1] << "\n";
 		}
-		if( /*l < r*/ l == r-1 ){
+		if(  l < n && l == r-1 ){
 			R.addEdge( row+n-l-1, acc, N_AMINOACIDS, Vcode );
 			//cerr << row+i << "\t" << acc << "\t#\n";
 		}
