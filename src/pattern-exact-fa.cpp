@@ -15,8 +15,7 @@ inline int c2i( int c ){
 void add_match_edge( DFA<N_AMINOACIDS+1> & R , int s1, int s2, int c,
 	map<long,long> & Vcode ){
 	for( int k = 0 ; k < N_AMINOACIDS ; k ++ ){
-		if( (aminoacids[k] != c) &&
-			pmbec_subst[aminoacids[k]-'A'][c-'A'] ){
+		if( pmbec_subst[aminoacids[k]-'A'][c-'A'] ){
 				R.addEdge( s1, s2, c2i(aminoacids[k]), Vcode );
 		}
 	}
@@ -33,9 +32,7 @@ DFA<N_AMINOACIDS+1> branch_for_peptide( string pep, int n, int r ){
 	R.addState( 0, Vcode );
 	for( l = 0 ; l <= r && l <= n ; l ++ ){
 		for( i = 0 ; i < n-l-1 ; i ++ ){
-			// uncomment line below for fuzzy match
 			add_match_edge( R, row+i, row+i+1, pep[i+l], Vcode );
-			//R.addEdge( row+i, row+i+1, c2i(pep[i+l]), Vcode );
 			//cerr << row+i << "\t" << row+i+1 << "\t" << pep[i+l] << endl;
 			if( l < r ){
 				R.addEdge( row+i, row+i+n-l, N_AMINOACIDS, Vcode );
@@ -43,9 +40,7 @@ DFA<N_AMINOACIDS+1> branch_for_peptide( string pep, int n, int r ){
 			}
 		}
 		if(  l < n && l <= r ){
-			// uncomment line below for fuzzy match
 			add_match_edge( R, row+n-l-1, acc, pep[n-1], Vcode );
-			//R.addEdge( row+n-l-1, acc, c2i(pep[n-1]), Vcode );
 			//cerr << row+i << "\t" << acc << "\t" << pep[n-1] << "\n";
 		}
 		if(  l < n && l < r ){
